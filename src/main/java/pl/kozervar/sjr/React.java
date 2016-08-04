@@ -1,12 +1,12 @@
 package pl.kozervar.sjr;
 
 import jdk.nashorn.api.scripting.NashornScriptEngine;
+import lombok.NonNull;
+import org.springframework.context.ApplicationContext;
 
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -15,15 +15,19 @@ import java.util.List;
 public class React {
 
     private final NashornScriptEngine nashornScriptEngine;
+    private ApplicationContext context;
+    private String webResourcesDirectory;
 
-    public React(){
+    public React(@NonNull ApplicationContext context, @NonNull String webResourcesDirectory){
+        this.context = context;
+        this.webResourcesDirectory = webResourcesDirectory;
         nashornScriptEngine = initializeScriptEngine();
     }
 
     public  String render(Object ... params) {
         try {
-//            Object html = engineHolder.get().invokeFunction("__NASHORN__RENDER__");
-            Object html = nashornScriptEngine.invokeFunction("__NASHORN__RENDER__", params);
+            Object html = engineHolder.get().invokeFunction("__NASHORN__RENDER__", params);
+//            Object html = nashornScriptEngine.invokeFunction("__NASHORN__RENDER__", params);
             return String.valueOf(html);
         }
         catch (Exception e) {
@@ -32,16 +36,21 @@ public class React {
     }
 
     private Reader read(String path) {
-        InputStream in = getClass().getClassLoader().getResourceAsStream(path);
-        return new InputStreamReader(in);
+        InputStream inputStream = null;
+        try {
+            inputStream = context.getResource(path).getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new InputStreamReader(inputStream);
     }
 
     private NashornScriptEngine initializeScriptEngine(){
         NashornScriptEngine nashornScriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
         try {
-            nashornScriptEngine.eval(read("static/nashorn-polyfill.js"));
-            nashornScriptEngine.eval(read("static/nashorn.js"));
-            nashornScriptEngine.eval(read("static/bundle.server.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn-polyfill.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "bundle.server.js"));
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }
@@ -53,9 +62,9 @@ public class React {
         protected NashornScriptEngine initialValue() {
             NashornScriptEngine nashornScriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
             try {
-                nashornScriptEngine.eval(read("static/nashorn-polyfill.js"));
-                nashornScriptEngine.eval(read("static/nashorn.js"));
-                nashornScriptEngine.eval(read("static/bundle.server.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn-polyfill.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "bundle.server.js"));
             } catch (ScriptException e) {
                 throw new RuntimeException(e);
             }
