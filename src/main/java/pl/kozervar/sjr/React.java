@@ -14,20 +14,19 @@ import java.util.List;
  */
 public class React {
 
-    private final NashornScriptEngine nashornScriptEngine;
     private ApplicationContext context;
     private String webResourcesDirectory;
 
     public React(@NonNull ApplicationContext context, @NonNull String webResourcesDirectory){
         this.context = context;
         this.webResourcesDirectory = webResourcesDirectory;
-        nashornScriptEngine = initializeScriptEngine();
     }
 
     public  String render(Object ... params) {
         try {
-            Object html = engineHolder.get().invokeFunction("__NASHORN__RENDER__", params);
+//            Object html = engineHolder.get().invokeFunction("__NASHORN__RENDER__", params);
 //            Object html = nashornScriptEngine.invokeFunction("__NASHORN__RENDER__", params);
+            Object html = initializeScriptEngine().invokeFunction("__NASHORN__RENDER__", params);
             return String.valueOf(html);
         }
         catch (Exception e) {
@@ -48,9 +47,9 @@ public class React {
     private NashornScriptEngine initializeScriptEngine(){
         NashornScriptEngine nashornScriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
         try {
-            nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn-polyfill.js"));
-            nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn.js"));
-            nashornScriptEngine.eval(read(webResourcesDirectory + "bundle.server.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "server/nashorn-polyfill.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "server/nashorn.js"));
+            nashornScriptEngine.eval(read(webResourcesDirectory + "server/server.js"));
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }
@@ -62,9 +61,9 @@ public class React {
         protected NashornScriptEngine initialValue() {
             NashornScriptEngine nashornScriptEngine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
             try {
-                nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn-polyfill.js"));
-                nashornScriptEngine.eval(read(webResourcesDirectory + "nashorn.js"));
-                nashornScriptEngine.eval(read(webResourcesDirectory + "bundle.server.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "server/nashorn-polyfill.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "server/nashorn.js"));
+                nashornScriptEngine.eval(read(webResourcesDirectory + "server/server.js"));
             } catch (ScriptException e) {
                 throw new RuntimeException(e);
             }

@@ -1,16 +1,17 @@
 import React from 'react';
 import $ from 'jquery';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import styles from './../styles/Application.less';
-//if(typeof window !== 'undefined') {
-//    require('!isomorphic-style!css!less!./../styles/Application.less');
-//}
+import styles from './../styles/Application.scss';
 
-//require('!isomorphic-style!css!less!./../styles/Application.less');
-
-export class Application extends React.Component {
+class Application extends React.Component {
     constructor(props) {
         super(props);
+        //this.context.insertCss = (...styles) => {
+        //    const removeCss = styles.map(style => style._insertCss()); // eslint-disable-line no-underscore-dangle, max-len
+        //    return () => {
+        //        removeCss.forEach(f => f());
+        //    };
+        //};
         if(props.data) {
             this.data = props.data;
             this.state = {
@@ -31,7 +32,7 @@ export class Application extends React.Component {
     }
     render() {
         return (
-            <div className="app-hello-message">
+            <div className={styles.appHelloMessage}>
                 Hello {this.state.name} #{this.state.counter} at {this.state.timestamp}
             </div>
         );
@@ -43,3 +44,5 @@ export class Application extends React.Component {
         clearInterval(this.interval);
     }
 }
+
+export default withStyles(styles)(Application);

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import pl.kozervar.sjr.configuration.properties.ApplicationConfigurationProperties;
 
@@ -35,6 +36,13 @@ public class MainController {
         String rendered = react.render(service.getCounterObj("Server"));
         model.put("content", rendered);
         return new ModelAndView("index", model);
+    }
+
+    @RequestMapping("/home")
+    @ResponseBody
+    public String asString(Map<String, Object> model) throws Exception {
+        String rendered = react.render();
+        return rendered;
     }
 
 }
